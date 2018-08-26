@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <link href="sources/video-js.css" rel="stylesheet">
+    <link href="sources/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+    <!--<script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>-->
+    <style>
+        video {
+            height: auto;
+            width: 100%;
+        }
+
+        .video-js-responsive-container.vjs-hd {
+            padding-top: 56.25%;
+        }
+
+        .video-js-responsive-container.vjs-sd {
+            padding-top: 75%;
+        }
+
+        .video-js-responsive-container {
+            width: 100%;
+            position: relative;
+        }
+
+        .video-js-responsive-container .video-js, #player{
+                height: 100% !important;
+                width: 100% !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+        }
+        #skipAdButton {
+            margin-right: 0;
+            -webkit-transition: margin-right 0.5s; /* For Safari 3.1 to 6.0 */
+            transition: margin-right 0.5s;
+        }
+
+            #skipAdButton:hover {
+                margin-right: 25px;
+            }
+
+            /* for creating yelloe time toolkit*/
+        div.vjs-control-bar {
+            height: 0 !important;
+        }
+        div.vjs-play-progress.vjs-slider-bar {
+            background-color: #F4D560;
+        }
+
+        div.vjs-progress-holder.vjs-slider.vjs-slider-horizontal {
+            margin: 0;
+        }
+        .video-js .vjs-play-progress:before {
+            display: none;
+        }
+        .vjs-progress-control.vjs-control {
+            height: 0;
+        }
+        div.vjs-play-progress.vjs-slider-bar {
+            height: 10px !important;
+        }
+        div.vjs-progress-holder.vjs-slider.vjs-slider-horizontal {
+            height: 0;
+        }
+        div.vjs-load-progress {
+            height: 10px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="adVideoDiv" hidden>
+                    <div class="video-js-responsive-container vjs-hd">
+                        <a id="adURL" href="https://www.google.com" target="_blank">
+                            <div id="divForMobileTouchEnd">
+                                <video id="adVideo" class="video-js vjs-big-play-centered" controls preload="auto"
+                                       poster="myvideoposter.png" data-setup='{"inactivityTimeout": 0}' style="width: 100%; height: 100%;">
+                                    <source src="video.mp4" type='video/mp4'>
+                                    <p class="vjs-no-js">
+                                        To view this video please enable JavaScript, and consider upgrading to a web browser that
+                                        supports HTML5 video
+                                    </p>
+                                </video>
+                            </div>
+                            </a>
+                            <div id="skipAdButton" style="position:absolute;right: 15px; bottom: 40px; z-index:999; padding: 5px; background-color:#E5E5E5; cursor: default;">
+                                <h2 style="margin:0;">Skip AD <span id="counter">5</span></h2>
+                            </div>
+                    </div>
+                </div>
+                <div id="myVideoDiv">
+                    <div class="video-js-responsive-container vjs-hd">
+                        <div id="player"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="sources/jquery-1.9.1.min.js"></script>
+    <script src="sources/video.js"></script>
+
+
+    <script>
+
+        // **** Code from youtube API documentation ****
+
+        // < !--1. The<iframe>(and video player) will replace this < div > tag. -- >
+        //   <div id="player"></div>
+
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'mEwE0LejOtE',
+                events: {
+                    //'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // 4. The API will call this function when the video player is ready.
+        //function onPlayerReady(event) {
+        //event.target.playVideo();
+        //}
+
+        // 5. The API calls this function when the player's state changes.
+        //    The function indicates that when playing a video (state=1),
+        //    the player should play for six seconds and then stop.
+        var done = false;
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !done) {
+                setTimeout(stopVideo, 1000); // I have changed it, it will call stopVideo function after 500 milli seconds (ms) automatically and ad starts.
+                done = true;
+            }
+        }
+        function stopVideo() {
+            player.pauseVideo(); // pause video of you tube
+            showAdAndStart(); // I have added it
+        }
+
+        //  ********** My own code started (I also changed some of the lines above, so after every line I have commented) *************
+
+        var myVideoDiv = $('#myVideoDiv');
+        var adVideoDiv = $('#adVideoDiv');
+        var myPlayer = videojs('#adVideo');
+
+        var adVideo = adVideoDiv.find('video')[0];
+
+        var adShowedFirstTime = false;
+
+        // Show ad and then auto starts it.
+        function showAdAndStart() {
+            myVideoDiv.hide(); // hides you tube video containing div
+            adVideoDiv.show("100"); // shows ad div after 100 ms
+            setTimeout(startVideo, 100); // calls startVideo function by sending ad video in it after 100 ms
+        }
+
+        adVideo.addEventListener('ended', showAndStartMyVideo);
+
+        // Function which gets video element and start playing it
+        function startVideo() {
+            myPlayer.play();
+
+            startCounting();
+        }
+
+        function startCounting() {
+            if (!adShowedFirstTime) {
+                var seconds = parseInt($('span#counter')[0].innerHTML);
+                var countingNumberSpan = $('span#counter')[0];
+
+                countingNumberSpan.innerHTML = seconds;
+
+                callOutAfterTimeInterval = function () {
+                    seconds--;
+                    countingNumberSpan.innerHTML = seconds;
+
+                    if (seconds == 0) {
+                        clearInterval(countingInterval);
+                        countingNumberSpan.innerHTML = " ";
+                        enableSkipAdButton();
+                    }
+                };
+
+                var countingInterval = setInterval(callOutAfterTimeInterval, 1000);
+                adShowedFirstTime = true;
+
+
+            }
+
+        }
+
+        function enableSkipAdButton() {
+            $('#skipAdButton').click(function () {
+                showAndStartMyVideo();
+            });
+        }
+
+        function showAndStartMyVideo() {
+            adVideoDiv.remove();
+            myVideoDiv.show("100");
+            setTimeout(function () { player.playVideo(); }, 100);
+        }
+
+
+        var firstTouch = false;
+        var isPaused = myPlayer.paused();
+
+        window.addEventListener('touchstart', function () {
+            if (!firstTouch) {
+
+                $('div#divForMobileTouchEnd').on('touchend', function () {
+                    var isPaused = myPlayer.paused();
+                    if (isPaused) {
+                        myPlayer.play();
+                    } else {
+                        window.open($('a#adURL').attr('href').toString(), '_blank');
+                        myPlayer.pause();
+                    }
+                });
+                firstTouch = true;
+            }
+        });
+
+    </script>
+
+
+    <!-- Code for manipulating timeline bar-->
+    <script>
+        $(function () {
+            setTimeout(function () {
+                $('button.vjs-fullscreen-control.vjs-control.vjs-button').remove();
+                $('div.vjs-remaining-time.vjs-time-control.vjs-control').remove();
+                $('button.vjs-play-control.vjs-control.vjs-button').remove();
+                $('button.vjs-mute-control.vjs-control.vjs-button').remove();
+                $('div.vjs-volume-bar.vjs-slider-bar.vjs-slider').remove();
+                $('div.vjs-volume-panel.vjs-control.vjs-volume-panel-horizontal').remove();
+                $('.vjs-time-tooltip').remove();
+                $('div.vjs-progress-holder.vjs-slider.vjs-slider-horizontal').css('margin', 0);
+                $('.vjs-control-bar').css('height', 10);
+                $('.vjs-mouse-display').remove();
+
+                //$('div.vjs-progress-control.vjs-control').unbind('click');
+                //alert($('div.vjs-progress-control.vjs-control').find('*').length);
+                //$('div.vjs-progress-control.vjs-control').find('*').each(function () {
+                //    console.log(this);
+                //    $(this).unbind('click');
+                //    $(this).unbind('mouseUp');
+                //    $(this).unbind('mouseDown');
+                //});
+
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
