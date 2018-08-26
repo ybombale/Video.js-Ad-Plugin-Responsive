@@ -1,5 +1,5 @@
 # Video.js-Ad-Plugin-Responsive
-  A pre roll AD plugin created using video.js fully RESPONSIVE. We have used this pro roll AD over YouTube video iFrame.You can use it on any video.
+  A pre roll AD plugin created using video.js fully RESPONSIVE. We have used this pre roll AD over YouTube video iFrame.You can use it on any video.
 
   You can use it as per your requirements and per your wish. Any kind of use which cannot violate the License Agreements of attached frameworks like jQuery, Bootstrap, Video.js is permitted.
 
