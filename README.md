@@ -18,7 +18,7 @@
     It contains timeline came with Video.js without default buttons like Volume, Full Screeen etc.
           
 ### 2.2 Small yellow timeline:
-    It contains a simple yellow bar in the timeline. Only yellow bar in the timline without any buttons.
+    It contains a simple yellow bar in the timeline. Only yellow bar in the timeline without any buttons.
 
 ### 2.3 Big yellow timeline:
-    It contains a simple big yellow bar in the timeline. Only yellow bar in the timline without any buttons.
+    It contains a simple big yellow bar in the timeline. Only yellow bar in the timeline without any buttons.
